@@ -37,9 +37,18 @@ export async function POST(request: Request) {
       createdAt: new Date().toISOString(),
     };
 
-    await db.collection("interviews").add(interview);
+    const docRef = await db.collection("interviews").add(interview);
+    const interviewId = docRef.id;
 
-    return Response.json({ success: true }, { status: 200 });
+    return Response.json(
+      {
+        success: true,
+        interviewId: interviewId,
+        url: `${process.env.NEXT_PUBLIC_APP_URL || "https://ai-mock-interview-2pg1.vercel.app"}/interview/${interviewId}`,
+        questions: interview.questions,
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Error:", error);
     return Response.json({ success: false, error: error }, { status: 500 });
